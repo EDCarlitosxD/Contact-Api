@@ -2,6 +2,7 @@ package com.edcarlitos.conctactapi.controller;
 
 import com.edcarlitos.conctactapi.dto.ContactResponse;
 import com.edcarlitos.conctactapi.entity.Contact;
+import com.edcarlitos.conctactapi.entity.UserEntity;
 import com.edcarlitos.conctactapi.exceptions.ContactNotFoundException;
 import com.edcarlitos.conctactapi.service.ContactService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,13 +24,13 @@ public class ContactController {
     private final ContactService contactService;
 
 
-    @GetMapping("/{idUser}")
-    @PreAuthorize("#idUser == authentication.principal.id")
+    @GetMapping("/")
     public ResponseEntity<Page<Contact>> getAllContacts(
             @RequestParam(defaultValue = "0") Integer pageNumber,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            @PathVariable Long idUser){
-
+            Authentication authentication){
+        UserEntity userEntity = (UserEntity) authentication.getPrincipal();
+        Long idUser = userEntity.getId();
         return ResponseEntity.status(HttpStatus.OK).body(contactService.getAllContacts(pageNumber,pageSize,idUser));
     }
 
